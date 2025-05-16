@@ -1,11 +1,9 @@
 ﻿using System;
 namespace westpac.Interfaces
 {
-	public class IRestClient
+	public interface IRestClient
 	{
-		public IRestClient()
-		{
-		}
+		public Task<HttpResponseMessage> PostRequest(string url, string body);
 	}
 }
 

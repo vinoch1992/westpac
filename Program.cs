@@ -1,3 +1,6 @@
+using westpac.Helpers;
+using westpac.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Add(new ServiceDescriptor(typeof(IHttpClientFactory), typeof(HttpClientFactory), ServiceLifetime.Scoped));
+builder.Services.Add(new ServiceDescriptor(typeof(IRestClient), typeof(RestClient), ServiceLifetime.Scoped));
 
 var app = builder.Build();
 
