@@ -1,4 +1,4 @@
-namespace westpac;
+namespace westpac.Models;
 
 public class User
 {
@@ -8,5 +8,5 @@ public class User
 
     public string Password { get; set; } = string.Empty;
 
-    public string Language { get; set; } = "en_US";
+    public string Language { get; set; } = string.Empty;
 }
