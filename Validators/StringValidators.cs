@@ -38,6 +38,17 @@ namespace westpac.Validators
 
             return Tuple.Create(true, string.Empty);
         }
+
+        public static Tuple<bool, string> IsValidPassword(string password)
+        {
+            // validating the given password.
+            if (password.Length < 8)
+            {
+                return Tuple.Create(false, "Password must have atleast 8 characters");
+            }
+
+            return Tuple.Create(true, string.Empty);
+        }
     }
 }
 

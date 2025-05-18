@@ -1,3 +1,4 @@
+using System.Dynamic;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using westpac.Interfaces;
@@ -35,6 +36,13 @@ public class UserController : ControllerBase
             return RestResponse(400, "ValidationError", isValidEmail.Item2);
         }
 
+        // Validating the input password
+        var isValidPassword = StringValidators.IsValidPassword(password);
+        if (!isValidPassword.Item1)
+        {
+            return RestResponse(400, "ValidationError", isValidPassword.Item2);
+        }
+
         var user = new User
         {
             Name = name,
@@ -63,7 +71,7 @@ public class UserController : ControllerBase
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
             }
 
-            return JsonConvert.DeserializeObject(response.ToString());
+            return JsonConvert.DeserializeObject<ExpandoObject>(response.ToString());
         }
         catch (Exception)
         {
@@ -72,8 +80,22 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public async Task<string?> Login(string email, string password)
+    public async Task<object?> Login(string email, string password)
     {
+        // Validating the input email
+        var isValidEmail = StringValidators.IsValidEmail(email);
+        if (!isValidEmail.Item1)
+        {
+            return RestResponse(400, "ValidationError", isValidEmail.Item2);
+        }
+
+        // Validating the input password
+        var isValidPassword = StringValidators.IsValidPassword(password);
+        if (!isValidPassword.Item1)
+        {
+            return RestResponse(400, "ValidationError", isValidPassword.Item2);
+        }
+
         var user = new User
         {
             Email = email,
@@ -92,7 +114,20 @@ public class UserController : ControllerBase
         // or check for success/failure and return appropriate messages.
         // For now, we'll just return the raw response as a string
         // NOTE 2: Current requirement is to return the response from opensensemap as it is.
-        return response?.ToString();
+        try
+        {
+            var code = (response as dynamic).code;
+            if (code.ToString() != "Authorized")
+            {
+                return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
+            }
+
+            return JsonConvert.DeserializeObject<ExpandoObject>(response.ToString());
+        }
+        catch (Exception)
+        {
+            return RestResponse(400, "Error", "Something went wrong");
+        }
     }
 
     private object RestResponse(int responsecode, string code, string message)
