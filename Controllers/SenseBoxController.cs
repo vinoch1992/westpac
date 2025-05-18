@@ -29,7 +29,7 @@ public class SenseBoxController : ControllerBase
         var jsonBody = LowercaseJsonSerializer.SerializeObject(senseBox);
 
         // Send the POST request
-        var response = await _restClient.PostRequest("https://api.opensensemap.org/boxes", jsonBody, true);
+        var response = await _restClient.PostRequest("boxes", jsonBody, true);
 
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
@@ -39,7 +39,7 @@ public class SenseBoxController : ControllerBase
         try
         {
             var code = (response as dynamic).code;
-            if (!string.IsNullOrEmpty(code))
+            if (code != null)
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
             }
@@ -65,7 +65,7 @@ public class SenseBoxController : ControllerBase
         }
 
         // Preparing the URL
-        string URL = $"https://api.opensensemap.org/boxes/{senseBoxId}";
+        string URL = $"boxes/{senseBoxId}";
         if (!string.IsNullOrEmpty(format))
             URL += $"?format={format}";
 
@@ -80,7 +80,7 @@ public class SenseBoxController : ControllerBase
         try
         {
             var code = (response as dynamic).code;
-            if (!string.IsNullOrEmpty(code))
+            if (code != null)
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
             }

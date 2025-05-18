@@ -53,7 +53,7 @@ public class UserController : ControllerBase
         var jsonBody = LowercaseJsonSerializer.SerializeObject(user);
 
         // Send the POST request
-        var response = await _restClient.PostRequest("https://api.opensensemap.org/users/register", jsonBody);
+        var response = await _restClient.PostRequest("users/register", jsonBody);
 
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
@@ -63,6 +63,11 @@ public class UserController : ControllerBase
         try
         {
             var code = (response as dynamic).code;
+            if (code == null)
+            {
+                return RestResponse(400, "Error", "Something went wrong");
+            }
+
             if (code.ToString() != "Created")
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
@@ -100,7 +105,7 @@ public class UserController : ControllerBase
         var jsonBody = LowercaseJsonSerializer.SerializeObject(user);
 
         // Send the POST request
-        var response = await _restClient.PostRequest("https://api.opensensemap.org/users/sign-in", jsonBody);
+        var response = await _restClient.PostRequest("users/sign-in", jsonBody);
 
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
@@ -110,6 +115,11 @@ public class UserController : ControllerBase
         try
         {
             var code = (response as dynamic).code;
+            if (code == null)
+            {
+                return RestResponse(400, "Error", "Something went wrong");
+            }
+
             if (code.ToString() != "Authorized")
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
@@ -134,7 +144,7 @@ public class UserController : ControllerBase
     public async Task<object?> Logout()
     {
         // Send the POST request
-        var response = await _restClient.PostRequest("https://api.opensensemap.org/users/sign-out", "", true);
+        var response = await _restClient.PostRequest("users/sign-out", "", true);
 
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
@@ -145,11 +155,17 @@ public class UserController : ControllerBase
         {
             // Clear the token from memory cache
             var code = (response as dynamic).code;
+            if (code == null)
+            {
+                return RestResponse(400, "Error", "Something went wrong");
+            }
+
             if (code.ToString() != "OK")
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
             }
 
+            // Remove the JWT Token from memory cache
             _memoryCache.Remove("JwtToken");
 
             return JsonConvert.DeserializeObject<ExpandoObject>(response.ToString());

@@ -11,10 +11,13 @@ namespace westpac.Rest
 
         private readonly IMemoryCache _memoryCache;
 
-        public RestClient(IMemoryCache memoryCache)
+        private readonly IConfiguration _configuration;
+
+        public RestClient(HttpClient httpClient, IMemoryCache memoryCache, IConfiguration configuration)
         {
-            _httpClient = new HttpClient();
+            _httpClient = httpClient;
             _memoryCache = memoryCache;
+            _configuration = configuration;
         }
 
         /**
@@ -26,6 +29,9 @@ namespace westpac.Rest
          */
         public async Task<object?> PostRequest(string url, string? body, bool isAuthorizationRequired)
         {
+            // Get base URL from app settings and concatenate
+            url = _configuration["BaseURL"] + url;
+
             // Validating the URL
             if (string.IsNullOrEmpty(url))
             {
@@ -77,6 +83,9 @@ namespace westpac.Rest
          */
         public async Task<object?> GetRequest(string url, bool isAuthorizationRequired)
         {
+            // Get base URL from app settings and concatenate
+            url = _configuration["BaseURL"] + url;
+
             // Validating the URL
             if (string.IsNullOrEmpty(url))
             {

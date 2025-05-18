@@ -10,8 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
-
-builder.Services.Add(new ServiceDescriptor(typeof(IRestClient), typeof(RestClient), ServiceLifetime.Scoped));
+builder.Services.AddHttpClient<IRestClient, RestClient>();
 
 var app = builder.Build();
 
