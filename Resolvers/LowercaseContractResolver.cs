@@ -3,6 +3,9 @@ using Newtonsoft.Json.Serialization;
 
 namespace westpac.Resolvers
 {
+    /**
+     * This is used to convert the json objects key to lowercase
+     */
     public class LowercaseJsonSerializer
     {
         private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings

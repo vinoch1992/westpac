@@ -23,36 +23,31 @@ public class UserController : ControllerBase
     /**
      * Registering a new user
      */
-    public async Task<object?> RegisterUser(string name, string email, string password, string? language)
+    public async Task<object?> RegisterUser([FromBody] User user)
     {
         // Validating the input name
-        var isValidName = StringValidators.IsValidName(name);
+        var isValidName = StringValidators.IsValidName(user.Name);
         if (!isValidName.Item1)
         {
             return RestResponse(400, "ValidationError", isValidName.Item2);
         }
 
         // Validating the input email
-        var isValidEmail = StringValidators.IsValidEmail(email);
+        var isValidEmail = StringValidators.IsValidEmail(user.Email);
         if (!isValidEmail.Item1)
         {
             return RestResponse(400, "ValidationError", isValidEmail.Item2);
         }
 
         // Validating the input password
-        var isValidPassword = StringValidators.IsValidPassword(password);
+        var isValidPassword = StringValidators.IsValidPassword(user.Password);
         if (!isValidPassword.Item1)
         {
             return RestResponse(400, "ValidationError", isValidPassword.Item2);
         }
 
-        var user = new User
-        {
-            Name = name,
-            Email = email,
-            Password = password,
-            Language = language ?? "en_US"
-        };
+        // Setting the default language if that is not present in the input.
+        user.Language = string.IsNullOrEmpty(user.Language) ? "en_US" : user.Language;
 
         // Convert the user object to JSON
         var jsonBody = LowercaseJsonSerializer.SerializeObject(user);
@@ -86,27 +81,21 @@ public class UserController : ControllerBase
     /**
      * User login
      */
-    public async Task<object?> Login(string email, string password)
+    public async Task<object?> Login([FromBody] User user)
     {
         // Validating the input email
-        var isValidEmail = StringValidators.IsValidEmail(email);
+        var isValidEmail = StringValidators.IsValidEmail(user.Email);
         if (!isValidEmail.Item1)
         {
             return RestResponse(400, "ValidationError", isValidEmail.Item2);
         }
 
         // Validating the input password
-        var isValidPassword = StringValidators.IsValidPassword(password);
+        var isValidPassword = StringValidators.IsValidPassword(user.Password);
         if (!isValidPassword.Item1)
         {
             return RestResponse(400, "ValidationError", isValidPassword.Item2);
         }
-
-        var user = new User
-        {
-            Email = email,
-            Password = password
-        };
 
         // Convert the user object to JSON
         var jsonBody = LowercaseJsonSerializer.SerializeObject(user);
