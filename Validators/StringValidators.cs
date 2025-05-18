@@ -25,6 +25,7 @@ namespace westpac.Validators
                 return Tuple.Create(false, "Name can only contain dots (.), dashes (-), underscores (_) and spaces");
             }
 
+            // Returning true if the validation is successful.
             return Tuple.Create(true, string.Empty);
         }
 
@@ -36,6 +37,7 @@ namespace westpac.Validators
                 return Tuple.Create(false, "Email address format is invalid");
             }
 
+            // Returning true if the validation is successful.
             return Tuple.Create(true, string.Empty);
         }
 
@@ -47,6 +49,7 @@ namespace westpac.Validators
                 return Tuple.Create(false, "Password must have atleast 8 characters");
             }
 
+            // Returning true if the validation is successful.
             return Tuple.Create(true, string.Empty);
         }
     }

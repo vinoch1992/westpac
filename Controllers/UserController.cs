@@ -20,6 +20,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("RegisterUser")]
+    /**
+     * Registering a new user
+     */
     public async Task<object?> RegisterUser(string name, string email, string password, string? language)
     {
         // Validating the input name
@@ -80,6 +83,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Login")]
+    /**
+     * User login
+     */
     public async Task<object?> Login(string email, string password)
     {
         // Validating the input email
@@ -130,6 +136,12 @@ public class UserController : ControllerBase
         }
     }
 
+    /**
+     * Returns an object of GenericResponse to output to API.
+     * @responsecode - request response code
+     * @code - Message Title
+     * @message - Message description
+     */
     private object RestResponse(int responsecode, string code, string message)
     {
         HttpContext.Response.StatusCode = responsecode;
