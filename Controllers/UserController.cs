@@ -127,6 +127,39 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPost("Logout")]
+    /**
+     * User logout
+     */
+    public async Task<object?> Logout()
+    {
+        // Send the POST request
+        var response = await _restClient.PostRequest("https://api.opensensemap.org/users/sign-out", "", true);
+
+        // NOTE 1: We might want to handle the response differently based on our requirements
+        // For example, we could deserialize it into a specific object type
+        // or check for success/failure and return appropriate messages.
+        // For now, we'll just return the raw response as a string
+        // NOTE 2: Current requirement is to return the response from opensensemap as it is.
+        try
+        {
+            // Clear the token from memory cache
+            var code = (response as dynamic).code;
+            if (code.ToString() != "OK")
+            {
+                return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
+            }
+
+            _memoryCache.Remove("JwtToken");
+
+            return JsonConvert.DeserializeObject<ExpandoObject>(response.ToString());
+        }
+        catch (Exception)
+        {
+            return RestResponse(400, "Error", "Something went wrong");
+        }
+    }
+
     /**
      * Returns an object of GenericResponse to output to API.
      * @responsecode - request response code
