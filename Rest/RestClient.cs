@@ -1,9 +1,8 @@
 using System.Text;
 using Newtonsoft.Json;
 using westpac.Interfaces;
-using westpac.Resolvers;
 
-namespace westpac.Helpers
+namespace westpac.Rest
 {
     public class RestClient : IRestClient
     {

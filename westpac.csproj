@@ -18,10 +18,12 @@
     <None Remove="Interfaces\" />
     <None Remove="Resolvers\" />
     <None Remove="Validators\" />
+    <None Remove="Rest\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="Resolvers\" />
     <Folder Include="Validators\" />
+    <Folder Include="Rest\" />
   </ItemGroup>
 </Project>

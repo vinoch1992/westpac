@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using westpac.Interfaces;
 using westpac.Models;
 using westpac.Resolvers;
@@ -18,13 +19,20 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("RegisterUser")]
-    public async Task<string?> RegisterUser(string name, string email, string password, string? language)
+    public async Task<object?> RegisterUser(string name, string email, string password, string? language)
     {
         // Validating the input name
         var isValidName = StringValidators.IsValidName(name);
         if (!isValidName.Item1)
         {
             return RestResponse(400, "ValidationError", isValidName.Item2);
+        }
+
+        // Validating the input email
+        var isValidEmail = StringValidators.IsValidEmail(email);
+        if (!isValidEmail.Item1)
+        {
+            return RestResponse(400, "ValidationError", isValidEmail.Item2);
         }
 
         var user = new User
@@ -47,7 +55,20 @@ public class UserController : ControllerBase
         // or check for success/failure and return appropriate messages.
         // For now, we'll just return the raw response as a string
         // NOTE 2: Current requirement is to return the response from opensensemap as it is.
-        return response?.ToString();
+        try
+        {
+            var code = (response as dynamic).code;
+            if (code.ToString() != "Created")
+            {
+                return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
+            }
+
+            return JsonConvert.DeserializeObject(response.ToString());
+        }
+        catch (Exception)
+        {
+            return RestResponse(400, "Error", "Something went wrong");
+        }
     }
 
     [HttpPost("Login")]
@@ -74,13 +95,13 @@ public class UserController : ControllerBase
         return response?.ToString();
     }
 
-    private string RestResponse(int responsecode, string code, string message)
+    private object RestResponse(int responsecode, string code, string message)
     {
         HttpContext.Response.StatusCode = responsecode;
-        return LowercaseJsonSerializer.SerializeObject(new GenericResponse()
+        return new GenericResponse()
         {
             Code = code,
             Message = message
-        });
+        };
     }
 }
