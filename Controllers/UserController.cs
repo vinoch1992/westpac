@@ -55,7 +55,6 @@ public class UserController : ControllerBase
         // Send the POST request
         var response = await _restClient.PostRequest("https://api.opensensemap.org/users/register", jsonBody);
 
-        // Return the response as a string
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
         // or check for success/failure and return appropriate messages.
@@ -103,7 +102,6 @@ public class UserController : ControllerBase
         // Send the POST request
         var response = await _restClient.PostRequest("https://api.opensensemap.org/users/sign-in", jsonBody);
 
-        // Return the response as a string
         // NOTE 1: We might want to handle the response differently based on our requirements
         // For example, we could deserialize it into a specific object type
         // or check for success/failure and return appropriate messages.
