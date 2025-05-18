@@ -1,5 +1,6 @@
 using System.Dynamic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using westpac.Interfaces;
 using westpac.Models;
@@ -13,17 +14,19 @@ namespace westpac.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IRestClient _restClient;
+    private readonly IMemoryCache _memoryCache;
 
-    public UserController(IRestClient restClient)
+    public UserController(IRestClient restClient, IMemoryCache memoryCache)
     {
         _restClient = restClient;
+        _memoryCache = memoryCache;
     }
 
     [HttpPost("RegisterUser")]
     /**
      * Registering a new user
      */
-    public async Task<object?> RegisterUser([FromBody] User user)
+    public async Task<object?> RegisterUser([FromBody] NewUser user)
     {
         // Validating the input name
         var isValidName = StringValidators.IsValidName(user.Name);
@@ -45,9 +48,6 @@ public class UserController : ControllerBase
         {
             return RestResponse(400, "ValidationError", isValidPassword.Item2);
         }
-
-        // Setting the default language if that is not present in the input.
-        user.Language = string.IsNullOrEmpty(user.Language) ? "en_US" : user.Language;
 
         // Convert the user object to JSON
         var jsonBody = LowercaseJsonSerializer.SerializeObject(user);
@@ -81,7 +81,7 @@ public class UserController : ControllerBase
     /**
      * User login
      */
-    public async Task<object?> Login([FromBody] User user)
+    public async Task<object?> Login([FromBody] LoginUser user)
     {
         // Validating the input email
         var isValidEmail = StringValidators.IsValidEmail(user.Email);
@@ -116,6 +116,10 @@ public class UserController : ControllerBase
             {
                 return RestResponse(400, code.ToString(), (response as dynamic).message.ToString());
             }
+
+            // Store the token in memory cache for future use in sensebox
+            string token = (response as dynamic).token.ToString();
+            _memoryCache.Set("JwtToken", token);
 
             return JsonConvert.DeserializeObject<ExpandoObject>(response.ToString());
         }

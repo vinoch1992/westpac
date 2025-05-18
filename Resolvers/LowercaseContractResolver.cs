@@ -10,7 +10,8 @@ namespace westpac.Resolvers
     {
         private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
         {
-            ContractResolver = new LowercaseContractResolver()
+            ContractResolver = new LowercaseContractResolver(),
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         public static string SerializeObject(object o)

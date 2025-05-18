@@ -1,4 +1,7 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using westpac.Interfaces;
 
@@ -8,17 +11,22 @@ namespace westpac.Rest
     {
         private readonly HttpClient _httpClient;
 
-        public RestClient()
+        private readonly IMemoryCache _memoryCache;
+
+        public RestClient(IMemoryCache memoryCache)
         {
             _httpClient = new HttpClient();
+            _memoryCache = memoryCache;
         }
 
         /**
          * Send a post request to given URL
          * @Url - Post URL
          * @Body - Content of the posting body.
+         * @isAuthorizationRequired - This will ensure 
+         *          to attach JWT token taken from memory cache to the request header
          */
-        public async Task<object?> PostRequest(string url, string body)
+        public async Task<object?> PostRequest(string url, string body, bool isAuthorizationRequired)
         {
             // Validating the URL
             if (string.IsNullOrEmpty(url))
@@ -33,10 +41,19 @@ namespace westpac.Rest
             }
 
             _httpClient.BaseAddress = new Uri(url);
+
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(body, Encoding.UTF8, "application/json")
             };
+
+            // Retrieve the JWT Token from memory cache and attach to header if the
+            // authorization is required
+            if (isAuthorizationRequired)
+            {
+                string token = _memoryCache.Get("JwtToken")?.ToString() ?? string.Empty;
+                httpRequestMessage.Headers.Add("Authorization", "Bearer " + token);
+            }
 
             var httpResponse = await _httpClient.SendAsync(httpRequestMessage);
 
